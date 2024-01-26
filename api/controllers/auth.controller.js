@@ -1,6 +1,6 @@
 import User from '../models/user.model.js';
 import bcryptjs from 'bcryptjs';
-// import { errorHandler } from '../utils/error.js';
+import { errorHandler } from '../utils/error.js';
 // import jwt from 'jsonwebtoken';
 
 export const signup = async (req, res, next) => {
@@ -14,8 +14,7 @@ export const signup = async (req, res, next) => {
       email === '' ||
       password === ''
     ) {
-    //   next(errorHandler(400, 'All fields are required'));
-    return res.status(400).json({message: "all fields are required"})
+      next(errorHandler(400, 'All fields are required'));
     }
   
     const hashedPassword = bcryptjs.hashSync(password, 10);
@@ -30,8 +29,7 @@ export const signup = async (req, res, next) => {
       await newUser.save();
       res.json('Signup successful');
     } catch (error) {
-        res.status(500).join({message: "error.message"})
-    //   next(error);
+      next(error);
     }
   };
   

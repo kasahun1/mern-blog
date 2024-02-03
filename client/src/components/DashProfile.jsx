@@ -15,13 +15,13 @@ import {
   updateStart,
   updateSuccess,
   updateFailure,
-  // deleteUserStart,
-  // deleteUserSuccess,
-  // deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
   // signoutSuccess,
 } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
-// import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 function DashProfile() {
   const { currentUser, error, loading } = useSelector((state) => state.user);
@@ -33,6 +33,7 @@ function DashProfile() {
   const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
   const [updateUserError, setUpdateUserError] = useState(null);
   const [formData, setFormData] = useState({});
+  const [showModal, setShowModal] = useState(false);
   const filePickerRef = useRef();
   const dispatch = useDispatch();
   const handleImageChange = (e) => {
@@ -132,6 +133,24 @@ function DashProfile() {
       setUpdateUserError(error.message);
     }
   };
+
+  const handleDeleteUser = async () => {
+    setShowModal(false);
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        dispatch(deleteUserFailure(data.message));
+      } else {
+        dispatch(deleteUserSuccess(data));
+      }
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  };
  
 
   return (
@@ -224,7 +243,7 @@ function DashProfile() {
        )}  */}
     </form>
     <div className='text-red-500 flex justify-between mt-5'>
-      <span className='cursor-pointer'>
+      <span onClick={() => setShowModal(true)} className='cursor-pointer'>
         Delete Account
       </span>
       <span className='cursor-pointer'>
@@ -246,7 +265,7 @@ function DashProfile() {
         {error}
       </Alert>
     )}
-    {/* <Modal
+    <Modal
       show={showModal}
       onClose={() => setShowModal(false)}
       popup
@@ -269,7 +288,7 @@ function DashProfile() {
           </div>
         </div>
       </Modal.Body>
-    </Modal> */}
+    </Modal>
   </div>
   )
 }
